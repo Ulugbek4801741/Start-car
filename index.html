@@ -37,10 +37,45 @@ let speed=0,lane=0,steer=0,nitro=100,elapsed=0,remaining=300,dist=0,curve=0,shak
 let bots=botNames.map((name,i)=>({name,color:botColors[i],lane:[.45,-.5,.15,-.15][i],progress:500+i*600,speed:150+i*10}));
 function resize(){dpr=Math.min(window.devicePixelRatio||1,1.5);W=innerWidth;H=innerHeight;canvas.width=W*dpr;canvas.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0)}
 addEventListener('resize',resize);resize();
-function drawCar(c,x,y,scale,player=false){c.save();c.translate(x,y);c.scale(scale,scale);let col=player?cars[selected][2]:arguments[0]===ctx? '#ed4b4b':'#4b8fdd';if(!player)col=typeof arguments[5]==='string'?arguments[5]:col;
-c.shadowColor='#0009';c.shadowBlur=10;c.fillStyle='#0a0c10';c.fillRect(-22,-24,10,22);c.fillRect(12,-24,10,22);c.fillRect(-22,14,10,22);c.fillRect(12,14,10,22);c.shadowBlur=0;
-c.fillStyle=col;c.beginPath();c.moveTo(-17,34);c.quadraticCurveTo(-24,16,-19,-22);c.quadraticCurveTo(-17,-39,-9,-42);c.lineTo(9,-42);c.quadraticCurveTo(18,-38,20,-22);c.quadraticCurveTo(24,16,17,34);c.quadraticCurveTo(0,40,-17,34);c.fill();
-c.fillStyle='#132a3d';c.beginPath();c.moveTo(-12,-26);c.quadraticCurveTo(-10,-35,-4,-35);c.lineTo(4,-35);c.quadraticCurveTo(12,-32,12,-26);c.lineTo(10,-8);c.lineTo(-10,-8);c.closePath();c.fill();c.fillStyle='#9ee3ff99';c.fillRect(-13,-20,3,12);c.fillRect(10,-20,3,12);c.fillStyle='#fff9c6';c.fillRect(-14,-37,7,4);c.fillRect(7,-37,7,4);c.fillStyle='#ff4545';c.fillRect(-13,29,6,3);c.fillRect(7,29,6,3);c.restore()}
+function drawCar(c,x,y,scale,player=false){
+ c.save();c.translate(x,y);c.scale(scale,scale);
+ let col=player?cars[selected][2]:(typeof arguments[5]==='string'?arguments[5]:'#4b8fdd');
+ // ground shadow and perspective rear-view body
+ c.fillStyle='#0008';c.beginPath();c.ellipse(0,10,30,43,0,0,Math.PI*2);c.fill();
+ // wheels, tire sidewalls, rims
+ c.fillStyle='#080b10';c.strokeStyle='#3d4650';c.lineWidth=2;
+ for(let yy of [-24,19])for(let xx of [-21,21]){
+   c.beginPath();c.roundRect(xx-5,yy-9,10,19,4);c.fill();c.stroke();
+   c.fillStyle='#9ba8b3';c.beginPath();c.arc(xx,yy,3.3,0,Math.PI*2);c.fill();c.fillStyle='#080b10';
+ }
+ // wide lower rear bumper
+ c.fillStyle='#10151b';c.beginPath();c.roundRect(-22,22,44,15,5);c.fill();
+ c.fillStyle='#2d343c';c.beginPath();c.roundRect(-18,25,36,8,3);c.fill();
+ // body silhouette with curved fenders
+ c.shadowColor='#0008';c.shadowBlur=8;c.shadowOffsetY=2;
+ c.fillStyle=col;c.beginPath();c.moveTo(-15,35);c.quadraticCurveTo(-25,28,-24,13);c.lineTo(-22,-18);c.quadraticCurveTo(-20,-34,-12,-40);c.quadraticCurveTo(0,-45,12,-40);c.quadraticCurveTo(20,-34,22,-18);c.lineTo(24,13);c.quadraticCurveTo(25,28,15,35);c.quadraticCurveTo(0,40,-15,35);c.closePath();c.fill();
+ c.shadowBlur=0;c.shadowOffsetY=0;
+ // side highlights and center body reflections
+ c.fillStyle='#ffffff24';c.beginPath();c.moveTo(-18,10);c.quadraticCurveTo(-18,-25,-10,-35);c.lineTo(-6,-33);c.quadraticCurveTo(-11,-13,-10,12);c.lineTo(-14,29);c.closePath();c.fill();
+ c.fillStyle='#00000020';c.beginPath();c.moveTo(10,-34);c.quadraticCurveTo(19,-20,19,8);c.lineTo(14,31);c.lineTo(7,34);c.quadraticCurveTo(13,4,9,-30);c.closePath();c.fill();
+ // rear glass, roof and glass reflections
+ c.fillStyle='#111d2b';c.beginPath();c.moveTo(-13,-26);c.quadraticCurveTo(-10,-36,-5,-36);c.lineTo(5,-36);c.quadraticCurveTo(11,-34,13,-26);c.lineTo(11,-10);c.lineTo(-11,-10);c.closePath();c.fill();
+ c.fillStyle='#6cc7ed45';c.beginPath();c.moveTo(-10,-28);c.lineTo(-6,-34);c.lineTo(-3,-34);c.lineTo(-5,-13);c.lineTo(-10,-13);c.closePath();c.fill();
+ c.strokeStyle='#080e16';c.lineWidth=2;c.beginPath();c.moveTo(-12,-8);c.lineTo(12,-8);c.stroke();
+ // rear spoiler / trunk details
+ c.fillStyle='#111820';c.beginPath();c.roundRect(-19,-5,38,5,2);c.fill();
+ c.fillStyle='#ffffff22';c.fillRect(-13,0,26,2);
+ // brake and tail lamps
+ c.fillStyle='#ff3138';c.shadowColor='#ff2535';c.shadowBlur=player&&keys.brake?12:3;
+ c.beginPath();c.roundRect(-18,15,8,7,2);c.roundRect(10,15,8,7,2);c.fill();c.shadowBlur=0;
+ c.fillStyle='#ffb2b4';c.fillRect(-17,17,5,2);c.fillRect(12,17,5,2);
+ // central plate and exhaust
+ c.fillStyle='#d7e0e8';c.beginPath();c.roundRect(-7,25,14,5,1);c.fill();
+ c.fillStyle='#090d12';c.beginPath();c.roundRect(-15,32,5,4,2);c.roundRect(10,32,5,4,2);c.fill();
+ // nitro glow and flames when active
+ if(player&&keys.nitro&&nitro>0){c.fillStyle='#33baff';c.shadowColor='#28aaff';c.shadowBlur=14;c.beginPath();c.moveTo(-9,36);c.lineTo(-6,52);c.lineTo(0,42);c.lineTo(6,52);c.lineTo(9,36);c.fill();c.shadowBlur=0}
+ c.restore()
+}
 function previewCar(){pctx.clearRect(0,0,500,200);pctx.fillStyle='#0b1623';pctx.fillRect(0,0,500,200);let g=pctx.createRadialGradient(250,130,10,250,130,210);g.addColorStop(0,'#29445f');g.addColorStop(1,'#0b1623');pctx.fillStyle=g;pctx.fillRect(0,0,500,200);drawCar(pctx,250,115,1.8,true)}
 const carGrid=document.getElementById('cars');carGrid.innerHTML=cars.map((c,i)=>'<button class="car'+(i===selected?' sel':'')+'" data-car="'+i+'">'+c[0]+'<span>'+c[1]+' km/h · tanlash</span></button>').join('');
 carGrid.addEventListener('click',e=>{let b=e.target.closest('[data-car]');if(!b)return;selected=Number(b.dataset.car);carGrid.querySelectorAll('.car').forEach(x=>x.classList.toggle('sel',Number(x.dataset.car)===selected));previewCar()});previewCar();
