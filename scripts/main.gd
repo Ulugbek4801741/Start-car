@@ -52,6 +52,14 @@ func _build_world() -> void:
 	ground.material_override = ground_mat
 	ground.position.y = -0.12
 	add_child(ground)
+	var ground_body := StaticBody3D.new()
+	var ground_collision := CollisionShape3D.new()
+	var ground_shape := BoxShape3D.new()
+	ground_shape.size = Vector3(180, 0.3, 180)
+	ground_collision.shape = ground_shape
+	ground_collision.position.y = -0.27
+	ground_body.add_child(ground_collision)
+	add_child(ground_body)
 
 func _build_track() -> void:
 	# A broad circular asphalt ring, created locally at runtime.
@@ -114,6 +122,12 @@ func _build_car() -> void:
 	car = CharacterBody3D.new()
 	car.set_script(CarController)
 	car.position = Vector3(0, 0.35, 33.5)
+	car.rotation.y = -PI / 2.0
+	var car_collision := CollisionShape3D.new()
+	var car_shape := BoxShape3D.new()
+	car_shape.size = Vector3(1.5, 0.7, 3.2)
+	car_collision.shape = car_shape
+	car.add_child(car_collision)
 	add_child(car)
 
 	var body := MeshInstance3D.new()
@@ -185,11 +199,8 @@ func _build_ui() -> void:
 
 	_add_touch_button(ui, "◀", Vector2(35, -155), "left")
 	_add_touch_button(ui, "▶", Vector2(145, -155), "right")
-	_add_touch_button("ui", "▲ GAS", Vector2(-185, -170), "gas")
-	_add_touch_button("ui", "▼ BRAKE", Vector2(-185, -75), "brake")
-
-func _add_touch_button(parent: Variant, text: Vector2, action: String) -> void:
-	pass
+	_add_touch_button(ui, "▲ GAS", Vector2(-185, -170), "gas")
+	_add_touch_button(ui, "▼ BRAKE", Vector2(-185, -75), "brake")
 
 func _add_touch_button(parent: Variant, caption: String, offset: Vector2, action: String) -> void:
 	var holder: CanvasLayer = parent if parent is CanvasLayer else get_node("UI")
