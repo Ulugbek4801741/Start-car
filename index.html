@@ -24,7 +24,10 @@ button{border:0;border-radius:14px;padding:14px 18px;background:#ff3d3d;color:wh
 .brand{margin-right:auto;text-shadow:0 2px 8px #0008}
 .pill{font-size:12px;padding:7px 10px;white-space:nowrap;backdrop-filter:blur(10px);box-shadow:0 5px 18px #0003}#pauseBtn{padding:7px 11px;background:#263b55;border:1px solid #ffffff40;color:#fff;font-size:12px}#pauseBtn:disabled{opacity:.45}
 #serverHud{color:#ffd58a;border-color:#e6ad4d66}#serverHud.online{color:#91f0b2;border-color:#48c97888}#serverHud.offline{color:#ff9b9b;border-color:#ff555588}#locationHud{color:#ffe0a6;border-color:#e9b66a55}#progressHud{color:#9fe8ff;border-color:#45baff55}#positionHud{color:#ffe6a0;border-color:#ffc85766;font-weight:900}
-#overlay{padding:14px;background:linear-gradient(135deg,#06101b80,#101b2d8c);backdrop-filter:blur(2px)}
+#overlay{z-index:5;pointer-events:auto;padding:14px;background:linear-gradient(135deg,#06101b80,#101b2d8c);backdrop-filter:blur(2px)}
+button,#carGrid,.car-option,#start{touch-action:manipulation;pointer-events:auto;-webkit-tap-highlight-color:transparent}
+.panel{pointer-events:auto}
+#carGrid{position:relative;z-index:6}
 .panel{width:min(94%,440px);max-height:88vh;overflow:auto;padding:20px;background:linear-gradient(150deg,#17283bed,#0b1423f2);border:1px solid #ffffff30}
 .panel h1{letter-spacing:1px;text-shadow:0 3px 15px #ff414455}
 .panel p{font-size:14px}
