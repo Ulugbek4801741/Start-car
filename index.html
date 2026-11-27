@@ -18,7 +18,27 @@ button{border:0;border-radius:14px;padding:14px 18px;background:#ff3d3d;color:wh
 .control.active{background:#ff3d3ddd}.small{font-size:12px;color:#b7c5d6}
 
 #speed{font-variant-numeric:tabular-nums;box-shadow:0 3px 16px #0005} .controls .control{box-shadow:0 8px 22px #0006;backdrop-filter:blur(6px)}
-#carGrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;max-height:36vh;overflow:auto}.car-option{padding:8px 5px;font-size:12px}</style></head>
+#carGrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;max-height:36vh;overflow:auto}.car-option{padding:8px 5px;font-size:12px}
+/* Refined responsive racing HUD and start screen */
+.top{gap:8px;flex-wrap:wrap;justify-content:center;left:10px;right:10px;top:10px}
+.brand{margin-right:auto;text-shadow:0 2px 8px #0008}
+.pill{font-size:12px;padding:7px 10px;white-space:nowrap;backdrop-filter:blur(10px);box-shadow:0 5px 18px #0003}
+#locationHud{color:#ffe0a6;border-color:#e9b66a55}
+#overlay{padding:14px;background:linear-gradient(135deg,#06101bc9,#101b2dcc);backdrop-filter:blur(4px)}
+.panel{width:min(94%,440px);max-height:88vh;overflow:auto;padding:20px;background:linear-gradient(150deg,#17283bed,#0b1423f2);border:1px solid #ffffff30}
+.panel h1{letter-spacing:1px;text-shadow:0 3px 15px #ff414455}
+.panel p{font-size:14px}
+.car-select{display:block;margin:14px 0}
+#carGrid{grid-template-columns:repeat(2,minmax(0,1fr));max-height:31vh;padding:2px}
+.car-option{min-width:0;border-radius:10px;line-height:1.25}
+.car-option strong{font-size:11px;white-space:normal}
+.car-option small{font-size:10px}
+#start{width:100%;background:linear-gradient(110deg,#ff3b42,#ff7a36);box-shadow:0 7px 22px #ff414433}
+.controls{bottom:max(14px,env(safe-area-inset-bottom));padding:0 12px}
+.control{width:clamp(58px,17vw,76px);height:clamp(58px,17vw,76px);font-size:13px}
+@media(max-width:620px){.top{justify-content:space-between}.brand{width:100%;font-size:17px;margin:0}.pill{font-size:10px;padding:6px 8px}#locationHud{display:none}.panel{padding:16px}.controls{padding:0 9px}.group{gap:8px}}
+@media(max-height:620px){.panel{max-height:82vh;padding:12px}.car-select{margin:7px 0}#carGrid{max-height:23vh}.panel h1{font-size:22px}.controls{bottom:8px}}
+</style></head>
 <body><canvas id="game"></canvas>
 <div class="top"><div class="brand">START<span>-CAR</span></div><div class="pill" id="speed">0 km/h</div><div class="pill" id="telemetry">1-gear · 800 RPM</div><div class="pill" id="locationHud">BUXORO ESKI SHAHAR</div><div class="pill" id="raceHud">15:00 · BOT 4</div></div>
 <div id="overlay"><div class="panel"><h1>START-CAR 🏁</h1><p>Avtomobilni tanlang va poygani boshlang.</p><div class="car-select" id="carSelect"><div id="carGrid"></div></div><select class="race-duration" id="duration"><option value="900">Poyga vaqti: 15 daqiqa</option><option value="1200">Poyga vaqti: 20 daqiqa</option></select><button id="start">RACE START</button><p class="small">Buxoro eski shahri • suv bo‘yi • tog‘li trassa</p></div></div>
@@ -29,13 +49,38 @@ function initEngineAudio(){if(engineAudio)return;try{const AC=window.AudioContex
 function drawCar(x,y,scale,color,angle=0){ctx.save();ctx.translate(x,y);ctx.rotate(angle);ctx.scale(scale,scale);ctx.shadowColor='#000b';ctx.shadowBlur=20;ctx.shadowOffsetY=13;ctx.fillStyle='#05070a';ctx.fillRect(-24,-31,11,25);ctx.fillRect(13,-31,11,25);ctx.fillRect(-24,12,11,25);ctx.fillRect(13,12,11,25);ctx.fillStyle='#68717b';ctx.fillRect(-21,-27,2,16);ctx.fillRect(17,-27,2,16);ctx.fillRect(-21,16,2,16);ctx.fillRect(17,16,2,16);ctx.shadowBlur=0;ctx.shadowOffsetY=0;ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(-17,30);ctx.quadraticCurveTo(-22,18,-18,-20);ctx.quadraticCurveTo(-16,-38,-9,-40);ctx.lineTo(9,-40);ctx.quadraticCurveTo(16,-36,19,-20);ctx.quadraticCurveTo(22,18,17,30);ctx.quadraticCurveTo(0,38,-17,30);ctx.fill();ctx.fillStyle='#172838';ctx.beginPath();ctx.moveTo(-12,-25);ctx.quadraticCurveTo(-10,-33,-6,-33);ctx.lineTo(6,-33);ctx.quadraticCurveTo(11,-30,12,-25);ctx.lineTo(11,-9);ctx.quadraticCurveTo(0,-5,-11,-9);ctx.closePath();ctx.fill();ctx.fillStyle='#9fdcff';ctx.globalAlpha=.65;ctx.fill();ctx.globalAlpha=1;ctx.fillStyle='#25394c';ctx.beginPath();ctx.roundRect(-12,-4,24,17,3);ctx.fill();ctx.fillStyle='#111a24';ctx.fillRect(-11,15,22,6);ctx.fillStyle='#fff3bc';ctx.fillRect(-14,-36,7,5);ctx.fillRect(7,-36,7,5);ctx.fillStyle='#f04440';ctx.fillRect(-13,26,6,3);ctx.fillRect(7,26,6,3);ctx.fillStyle='#10151b';ctx.fillRect(-8,22,16,2);ctx.fillStyle='#ffffff55';ctx.fillRect(-14,-19,2,17);ctx.fillRect(12,-19,2,17);ctx.fillStyle='#111';ctx.fillRect(-19,-2,4,8);ctx.fillRect(15,-2,4,8);ctx.restore()}
 function curveAt(y){const ahead=(1-y/Math.max(h,1))*760;return Math.sin((trackProgress+ahead)/380)*w*.20+Math.sin((trackProgress+ahead)/185)*w*.055}
 function drawFinishLine(w,h,progress){let y=h*.12+(h*.88)*progress;let roadWidth=w*(.5+.46*progress);let left=w/2+curveAt(y)-roadWidth/2;let cell=Math.max(12,Math.min(32,roadWidth/12));ctx.save();ctx.translate(left,y);for(let row=0;row<2;row++){for(let col=0;col<Math.ceil(roadWidth/cell);col++){ctx.fillStyle=(row+col)%2?'#fff':'#111';ctx.fillRect(col*cell,row*cell,cell,cell)}}ctx.restore();}
-function environmentZone(){return Math.floor(trackProgress/5200)%3}
-function drawBukhara(horizon){ctx.fillStyle='#c99b68';for(let side of [-1,1]){let base=side<0?0:w*.72;let width=w*.28;for(let i=0;i<5;i++){let x=base+i*width/5+Math.sin(i*8)*8;let bw=width/6;let bh=horizon*(.25+(i%3)*.08);ctx.fillStyle=['#b87949','#d3a16d','#a96c45'][i%3];ctx.fillRect(x,horizon-bh,bw,bh);ctx.fillStyle='#70472f';ctx.fillRect(x+bw*.38,horizon-bh*.48,bw*.24,bh*.48);ctx.fillStyle='#e6c18c';ctx.beginPath();ctx.arc(x+bw*.5,horizon-bh,bw*.28,Math.PI,0);ctx.fill();ctx.fillStyle='#8c5737';ctx.fillRect(x+bw*.12,horizon-bh*.8,bw*.76,4)}}
-let mx=w*.5;ctx.fillStyle='#c78c55';ctx.fillRect(mx-w*.17,horizon*.42,w*.34,horizon*.58);ctx.fillStyle='#875334';ctx.beginPath();ctx.ellipse(mx,horizon*.42,w*.10,horizon*.16,0,Math.PI,0);ctx.fill();ctx.fillStyle='#e0b47b';ctx.fillRect(mx-w*.035,horizon*.12,w*.07,horizon*.3);ctx.fillStyle='#a66a3f';ctx.beginPath();ctx.arc(mx,horizon*.12,w*.035,Math.PI,0);ctx.fill();ctx.fillStyle='#d5ae7c';ctx.fillRect(mx-w*.012,horizon*.02,w*.024,horizon*.1);ctx.fillStyle='#8b5b39';ctx.beginPath();ctx.arc(mx,horizon*.02,w*.012,Math.PI,0);ctx.fill()}
-function drawWater(horizon){let waterTop=horizon*.57;ctx.fillStyle='#328da0';ctx.fillRect(0,waterTop,w,horizon-waterTop);ctx.fillStyle='#9dd9d8';for(let i=0;i<24;i++){let x=(i*97+roadOffset*2)%w,y=waterTop+8+(i*17)%(horizon-waterTop);ctx.fillRect(x,y,18+(i%4)*8,2)}ctx.fillStyle='#b9a17d';ctx.fillRect(0,waterTop-5,w,7);ctx.fillRect(0,horizon-7,w,7);for(let side of [-1,1]){let x=side<0?w*.06:w*.88;ctx.fillStyle='#d5c29a';ctx.fillRect(x,waterTop-12,w*.06,14);ctx.fillStyle='#725f48';ctx.fillRect(x+w*.02,waterTop-22,w*.02,12)}}
-function drawMountains(horizon){let peaks=[[-.1,.72,.35],[.12,.56,.45],[.34,.74,.3],[.56,.52,.48],[.78,.68,.38],[1.02,.58,.46]];ctx.fillStyle='#637b83';peaks.forEach(([x,peak,width])=>{let px=x*w,base=horizon*.9,top=horizon*peak;ctx.beginPath();ctx.moveTo(px-width*w*.28,base);ctx.lineTo(px,top);ctx.lineTo(px+width*w*.32,base);ctx.closePath();ctx.fill();ctx.fillStyle='#d9e0dc';ctx.beginPath();ctx.moveTo(px,top);ctx.lineTo(px-width*w*.08,top+horizon*.19);ctx.lineTo(px+width*w*.12,top+horizon*.15);ctx.closePath();ctx.fill();ctx.fillStyle='#637b83'});ctx.fillStyle='#718d68';ctx.fillRect(0,horizon*.72,w,horizon*.28)}
+function environmentZone(){return Math.floor(trackProgress/14000)%3}
+function drawBukhara(horizon){
+  // Bukhara-inspired old-town skyline: warm mud-brick facades, domes and minarets.
+  ctx.fillStyle='#c99b68';ctx.fillRect(0,horizon*.55,w,horizon*.45);
+  for(let side of [-1,1]){for(let i=0;i<7;i++){let x=side<0?i*w*.105-w*.015:w*.73+i*w*.055;let bw=w*.075,bh=horizon*(.22+(i%3)*.07);ctx.fillStyle=['#b87949','#d3a16d','#a96c45'][i%3];ctx.fillRect(x,horizon-bh,bw,bh);ctx.fillStyle='#70472f';for(let j=0;j<3;j++)ctx.fillRect(x+bw*(.16+j*.27),horizon-bh*.55,bw*.13,bh*.2);ctx.fillStyle='#e6c18c';ctx.beginPath();ctx.arc(x+bw*.5,horizon-bh,bw*.28,Math.PI,0);ctx.fill();ctx.fillStyle='#68442f';ctx.fillRect(x+bw*.42,horizon-bh*.75,bw*.16,bh*.75)}}
+  let mx=w*.5;ctx.fillStyle='#c78c55';ctx.fillRect(mx-w*.18,horizon*.55,w*.36,horizon*.45);
+  ctx.fillStyle='#875334';ctx.beginPath();ctx.ellipse(mx,horizon*.55,w*.115,horizon*.17,0,Math.PI,0);ctx.fill();
+  ctx.fillStyle='#e0b47b';ctx.fillRect(mx-w*.035,horizon*.18,w*.07,horizon*.37);
+  ctx.fillStyle='#a66a3f';ctx.beginPath();ctx.arc(mx,horizon*.18,w*.035,Math.PI,0);ctx.fill();
+  ctx.fillStyle='#d5ae7c';ctx.fillRect(mx-w*.012,horizon*.02,w*.024,horizon*.16);
+  ctx.fillStyle='#8b5b39';ctx.beginPath();ctx.arc(mx,horizon*.02,w*.012,Math.PI,0);ctx.fill();
+  // distant courtyard walls and warm desert haze
+  ctx.fillStyle='#e6bd8a55';ctx.fillRect(0,horizon*.82,w,horizon*.18);
+}
+function drawWater(horizon){
+  let waterTop=horizon*.52;ctx.fillStyle='#277f99';ctx.fillRect(0,waterTop,w,horizon-waterTop);
+  let g=ctx.createLinearGradient(0,waterTop,0,horizon);g.addColorStop(0,'#70c5d0');g.addColorStop(1,'#155a79');ctx.fillStyle=g;ctx.fillRect(0,waterTop,w,horizon-waterTop);
+  ctx.fillStyle='#b7e8e5';for(let i=0;i<34;i++){let x=(i*83+roadOffset*2.2)%w,y=waterTop+6+(i*13)%(Math.max(1,horizon-waterTop));ctx.fillRect(x,y,14+(i%5)*9,1.5)}
+  // river banks and a small arched bridge
+  ctx.fillStyle='#c6ad82';ctx.fillRect(0,waterTop-7,w,10);ctx.fillRect(0,horizon-9,w,12);
+  ctx.fillStyle='#d9c49c';ctx.fillRect(w*.08,waterTop-22,w*.84,15);ctx.fillStyle='#80664d';
+  for(let i=0;i<5;i++){ctx.beginPath();ctx.arc(w*(.16+i*.17),waterTop-7,w*.055,Math.PI,0);ctx.fill()}
+  for(let side of [-1,1]){let x=side<0?w*.04:w*.91;ctx.fillStyle='#d5c29a';ctx.fillRect(x,waterTop-36,w*.055,29);ctx.fillStyle='#725f48';ctx.fillRect(x+w*.018,waterTop-49,w*.02,14)}
+}
+function drawMountains(horizon){
+  let peaks=[[-.08,.72,.38],[.12,.54,.48],[.32,.73,.34],[.52,.48,.52],[.73,.65,.43],[.96,.53,.5],[1.12,.7,.36]];
+  peaks.forEach(([x,peak,width],i)=>{let px=x*w,base=horizon*.94,top=horizon*peak;ctx.fillStyle=i%2?'#718b91':'#58777f';ctx.beginPath();ctx.moveTo(px-width*w*.38,base);ctx.lineTo(px,top);ctx.lineTo(px+width*w*.42,base);ctx.closePath();ctx.fill();ctx.fillStyle='#e1e8e2';ctx.beginPath();ctx.moveTo(px,top);ctx.lineTo(px-width*w*.10,top+horizon*.2);ctx.lineTo(px+width*w*.13,top+horizon*.17);ctx.closePath();ctx.fill();ctx.fillStyle='#718b91';ctx.fillRect(px-width*w*.22,base-horizon*.12,width*w*.44,horizon*.12)});
+  ctx.fillStyle='#718d68';ctx.fillRect(0,horizon*.76,w,horizon*.24);
+  for(let i=0;i<15;i++){let x=(i*137+31)%w,y=horizon*(.72+(i%4)*.055),r=5+(i%5)*3;ctx.fillStyle='#315b48';ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill()}
+}
 function road(){let horizon=h*.28,bottom=h,segments=48,zone=environmentZone();let sky=ctx.createLinearGradient(0,0,0,horizon+50);if(zone===0){sky.addColorStop(0,'#65a9d0');sky.addColorStop(1,'#f0d2a5')}else if(zone===1){sky.addColorStop(0,'#66b8d0');sky.addColorStop(1,'#d5edf0')}else{sky.addColorStop(0,'#477b9b');sky.addColorStop(1,'#d9e3df')}ctx.fillStyle=sky;ctx.fillRect(0,0,w,horizon+35);if(zone===0){ctx.fillStyle='#c8a071';ctx.fillRect(0,horizon*.58,w,horizon*.42);drawBukhara(horizon)}else if(zone===1){ctx.fillStyle='#77a66c';ctx.fillRect(0,horizon*.58,w,horizon*.42);drawWater(horizon)}else{drawMountains(horizon)}
-ctx.fillStyle=zone===2?'#658b63':'#82a96b';ctx.fillRect(0,horizon,w,h-horizon);for(let i=0;i<segments;i++){let y1=horizon+(i/segments)*(bottom-horizon),y2=horizon+((i+1)/segments)*(bottom-horizon);let c1=w/2+curveAt(y1),c2=w/2+curveAt(y2),half1=w*(.25+.23*(i/segments)),half2=w*(.25+.23*((i+1)/segments));ctx.fillStyle=i%2?'#555d67':'#646c76';ctx.beginPath();ctx.moveTo(c1-half1,y1);ctx.lineTo(c1+half1,y1);ctx.lineTo(c2+half2,y2);ctx.lineTo(c2-half2,y2);ctx.closePath();ctx.fill();ctx.fillStyle=i%2?'#fff':'#e84a45';ctx.fillRect(c1-half1-12,y1,12,Math.max(4,y2-y1));ctx.fillRect(c1+half1,y1,12,Math.max(4,y2-y1));if(i%3===0&&zone!==1){let scale=.25+i/segments*.9;ctx.fillStyle=zone===0?'#6d4934':'#315f36';ctx.beginPath();ctx.arc(c1-half1-38*scale,y1,12*scale,0,Math.PI*2);ctx.arc(c1+half1+38*scale,y1,12*scale,0,Math.PI*2);ctx.fill();}}
+ctx.fillStyle=zone===2?'#658b63':'#82a96b';ctx.fillRect(0,horizon,w,h-horizon);for(let i=0;i<segments;i++){let y1=horizon+(i/segments)*(bottom-horizon),y2=horizon+((i+1)/segments)*(bottom-horizon);let c1=w/2+curveAt(y1),c2=w/2+curveAt(y2),half1=w*(.25+.23*(i/segments)),half2=w*(.25+.23*((i+1)/segments));ctx.fillStyle=i%2?'#555d67':'#646c76';ctx.beginPath();ctx.moveTo(c1-half1,y1);ctx.lineTo(c1+half1,y1);ctx.lineTo(c2+half2,y2);ctx.lineTo(c2-half2,y2);ctx.closePath();ctx.fill();ctx.fillStyle=i%2?'#fff':'#e84a45';ctx.fillRect(c1-half1-12,y1,12,Math.max(4,y2-y1));ctx.fillRect(c1+half1,y1,12,Math.max(4,y2-y1));ctx.fillStyle='#d7d9d8';ctx.fillRect(c1-half1+8,y1,Math.max(2,w*.003),Math.max(2,y2-y1));ctx.fillRect(c1+half1-10,y1,Math.max(2,w*.003),Math.max(2,y2-y1));if(i%3===0&&zone!==1){let scale=.25+i/segments*.9;ctx.fillStyle=zone===0?'#6d4934':'#315f36';ctx.beginPath();ctx.arc(c1-half1-38*scale,y1,12*scale,0,Math.PI*2);ctx.arc(c1+half1+38*scale,y1,12*scale,0,Math.PI*2);ctx.fill();}}
 ctx.strokeStyle='#f5f2e8';ctx.lineWidth=Math.max(3,w*.006);ctx.setLineDash([Math.max(22,h*.05),Math.max(18,h*.035)]);ctx.lineDashOffset=-roadOffset;ctx.beginPath();for(let i=0;i<=segments;i++){let y=horizon+(i/segments)*(h-horizon),c=w/2+curveAt(y);if(i===0)ctx.moveTo(c,y);else ctx.lineTo(c,y)}ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#ffffff20';for(let i=0;i<18;i++){let y=horizon+(i/18)*(h-horizon),c=w/2+curveAt(y),half=w*(.25+.23*(i/18));ctx.fillRect(c-half+Math.sin(i*91)*30,y,2,3);ctx.fillRect(c+half-Math.cos(i*31)*40,y,2,3);}}
 carGrid.querySelectorAll('.car-option').forEach(btn=>btn.onclick=()=>{selectedCar=btn.dataset.car;carGrid.querySelectorAll('.car-option').forEach(x=>x.classList.toggle('selected',x===btn));});
 function drawBots(){bots.forEach(b=>{let phase=((b.progress+trackProgress*.65)%2400)/2400;let y=h*.15+phase*h*.72;let roadHalf=w*(.25+.23*phase);let cx=w/2+curveAt(y)+b.x*roadHalf;drawCar(cx,y,Math.max(.22,Math.min(.75,.22+phase*.55)),b.color);});}
