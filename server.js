@@ -19,7 +19,7 @@ function roomFor(id) {
 function publicRoom(room) {
   return { roomId: room.id, players: [...room.players.values()].map(p => ({
     id: p.id, name: p.name, car: p.car, color: p.color,
-    x: p.x, speed: p.speed, steer: p.steer, updatedAt: p.updatedAt
+    x: p.x, speed: p.speed, steer: p.steer, progress: p.progress, updatedAt: p.updatedAt
   })) };
 }
 function broadcast(room) {
@@ -49,7 +49,7 @@ wss.on('connection', (ws, _req, url) => {
   ws.playerId = playerId;
   room.players.set(playerId, {
     id: playerId, name: 'Poygachi', car: 'BMW M4 Competition', color: '#287be8',
-    x: 0, speed: 0, steer: 0, updatedAt: Date.now()
+    x: 0, speed: 0, steer: 0, progress: 0, updatedAt: Date.now()
   });
   ws.send(JSON.stringify({ type: 'welcome', playerId, roomId }));
   broadcast(room);
@@ -67,6 +67,7 @@ wss.on('connection', (ws, _req, url) => {
       player.steer = Math.max(-1, Math.min(1, Number(msg.steer) || 0));
       player.speed = Math.max(0, Math.min(500, Number(msg.speed) || 0));
       player.x = Math.max(-1, Math.min(1, Number(msg.x) || 0));
+      player.progress = Math.max(0, Number(msg.progress) || 0);
       player.updatedAt = Date.now();
     }
     broadcast(room);
